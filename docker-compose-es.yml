@@ -1,0 +1,74 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.13
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9301:9300"
+    environment:
+      - xpack.security.enabled=true  # enable authentication
+      - network.host=127.0.0.1
+      - http.host=0.0.0.0
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=Admin_123456
+      - ES_JAVA_OPTS=-Xms750m -Xmx750m
+      - bootstrap.memory_lock=true
+    volumes:
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - elasticsearch-net
+
+  postgres:
+    image: debezium/postgres:16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=pgsync
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./pgsync/conf.sql:/docker-entrypoint-initdb.d/config.sql
+      - ./postgres-data:/var/lib/postgresql
+    networks:
+      - elasticsearch-net
+
+  redis:
+    image: 'redis:alpine'
+    container_name: redis
+    ports:
+      - '6379'
+    networks:
+      - elasticsearch-net
+
+
+  pgsync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pgsync01
+    environment:
+      - PG_USER=pgsync
+      - PG_PASSWORD=123456
+      - PG_DATABASE=postgres
+      - PG_HOST=postgres
+      - PG_PORT=5432
+      - ELASTICSEARCH_HOST=elasticsearch
+      - ELASTICSEARCH_PORT=9200
+      - ELASTICSEARCH_SCHEME=http
+      - ELASTICSEARCH_USER=elastic
+      - ELASTICSEARCH_PASSWORD=Admin_123456
+      - ELASTICSEARCH=True
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+    networks:
+      - elasticsearch-net
+
+networks:
+  elasticsearch-net:
+    driver: bridge

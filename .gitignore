@@ -1,1 +1,4 @@
 .idea
+opensearch-data
+postgres-data
+elasticsearch-data
