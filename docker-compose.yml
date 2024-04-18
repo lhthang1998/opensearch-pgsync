@@ -4,13 +4,13 @@ services:
     image: opensearchproject/opensearch:latest # Specifying the latest available image - modify if you want a specific version
     container_name: opensearch
     environment:
-      - cluster.name=opensearch-cluster # Name the cluster
+      - cluster.name=opensearch # Name the cluster
       - node.name=opensearch # Name the node that will run in this container
       - discovery.seed_hosts=opensearch # Nodes to look for when discovering the cluster
       - cluster.initial_cluster_manager_nodes=opensearch # Nodes eligible to serve as cluster manager
       - bootstrap.memory_lock=true # Disable JVM heap memory swapping
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin_123456    # Sets the demo admin user password when using demo configuration, required for OpenSearch 2.12 and later
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin_123456
     ulimits:
       memlock:
         soft: -1 # Set memlock to unlimited (no soft or hard limit)
@@ -33,7 +33,7 @@ services:
     ports:
       - 5601:5601 # Map host port 5601 to container port 5601
     environment:
-      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
+      OPENSEARCH_HOSTS: '["https://opensearch:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
     networks:
       - opensearch-net
 
@@ -48,6 +48,7 @@ services:
       - POSTGRES_DB=postgres
     volumes:
       - ./pgsync/conf.sql:/docker-entrypoint-initdb.d/config.sql
+      - ./postgres-data:/var/lib/postgresql
     networks:
       - opensearch-net
 
@@ -75,7 +76,7 @@ services:
       - ELASTICSEARCH_PORT=9200
       - ELASTICSEARCH_USER=admin
       - ELASTICSEARCH_PASSWORD=Admin_123456
-      - ELASTICSEARCH_SCHEME=http
+      - ELASTICSEARCH_SCHEME=https
       - OPENSEARCH=True
       - REDIS_HOST=redis
       - REDIS_PORT=6379
