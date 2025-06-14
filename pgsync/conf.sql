@@ -12,3 +12,11 @@ CREATE TABLE IF NOT EXISTS product (
 INSERT INTO product (name) VALUES ('test product1');
 INSERT INTO product (name) VALUES ('test product2');
 INSERT INTO product (name) VALUES ('test product3');
+
+CREATE TABLE IF NOT EXISTS users (
+    user_id SERIAL NOT NULL,
+    name varchar(100) NOT NULL,
+    PRIMARY KEY ("user_id")
+);
+
+INSERT INTO users (name) VALUES ('user1');

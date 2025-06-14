@@ -4,7 +4,14 @@
     "index": "product",
     "nodes": {
       "table": "product",
-      "schema": "public",
+      "columns": []
+    }
+  },
+  {
+    "database": "postgres",
+    "index": "users",
+    "nodes": {
+      "table": "users",
       "columns": []
     }
   }
